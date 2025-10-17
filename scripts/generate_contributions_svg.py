@@ -6,7 +6,7 @@ This script fetches GitHub activity data and generates an SVG visualization
 
 import os
 import sys
-from datetime import datetime, timedelta  # TODO: Will be used for date range calculations
+from datetime import datetime, timedelta
 
 
 def fetch_github_contributions(username, token):
@@ -21,6 +21,7 @@ def fetch_github_contributions(username, token):
         Dictionary containing contribution data
     """
     # TODO: Implement GitHub API calls to fetch contribution data
+    # TODO: Use datetime/timedelta to calculate date ranges for contribution history
     # This is a placeholder implementation
     print(f"Fetching contributions for user: {username}")
     return {}
