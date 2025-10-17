@@ -152,8 +152,7 @@ for i in range(5):
 svg.append(f'<text class="lbl" x="{legend_x + 5*(cell+gap) + 4}" y="{legend_y+8}">More</text>')
 
 svg.append('</svg>')
-svg_text = "
-".join(svg)
+svg_text = "\n".join(svg)
 OUT.write_text(svg_text, encoding="utf-8")
 print(f"Wrote {OUT}")
 
