@@ -2,7 +2,7 @@ name: Update Activity Graph
 
 on:
   schedule:
-    - cron: "17 2 * * *" # Her gün 02:17 UTC
+    - cron: "17 2 * * *"
   workflow_dispatch: {}
   push:
     paths:
@@ -41,6 +41,9 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add github_activity.svg activity-*.svg || true
+          git add github_activity.svg
+          if ls activity-*.svg 1> /dev/null 2>&1; then
+            git add activity-*.svg
+          fi
           git commit -m "chore: update activity graph (with monthly snapshot) [skip ci]" || echo "No changes"
           git push
