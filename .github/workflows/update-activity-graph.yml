@@ -2,38 +2,45 @@ name: Update Activity Graph
 
 on:
   schedule:
-    # Run daily at midnight UTC
-    - cron: '0 0 * * *'
-  workflow_dispatch:
-    # Allow manual trigger
+    - cron: "17 2 * * *" # Her gün 02:17 UTC
+  workflow_dispatch: {}
+  push:
+    paths:
+      - ".github/workflows/update-activity-graph.yml"
+      - "scripts/generate_contributions_svg.py"
 
 jobs:
-  update-graph:
+  build:
     runs-on: ubuntu-latest
-    
+    permissions:
+      contents: write
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
-        
-      - name: Set up Python
-        uses: actions/setup-python@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.x'
-          
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-          
-      - name: Generate contributions SVG
+          python-version: "3.11"
+
+      - name: Install deps
+        run: pip install requests
+
+      - name: Generate SVG (+ monthly snapshot on day 1)
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_USERNAME: ${{ github.repository_owner }}
+          OUT_SVG: github_activity.svg
+          SNAPSHOT_MONTHLY: "true"
+          OUT_SNAPSHOT: "activity-${{ github.event.schedule }}.svg"
         run: |
+          # OUT_SNAPSHOT is optional; script auto-names as activity-YYYY-MM.svg
           python scripts/generate_contributions_svg.py
-          
-      - name: Commit and push if changed
+
+      - name: Commit & push
         run: |
-          git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "github-actions[bot]"
-          git add -A
-          git diff --quiet && git diff --staged --quiet || (git commit -m "Update activity graph" && git push)
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add github_activity.svg activity-*.svg || true
+          git commit -m "chore: update activity graph (with monthly snapshot) [skip ci]" || echo "No changes"
+          git push
