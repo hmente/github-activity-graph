@@ -106,8 +106,7 @@ for c in range(cols):
         svg.append(f'<rect x="{x}" y="{y}" width="{cell}" height="{cell}" rx="2" ry="2" fill="{color}"><title>{date}: {v} contributions</title></rect>')
 
 svg.append('</svg>')
-svg_text = "
-".join(svg)
+svg_text = "\n".join(svg)
 OUT.write_text(svg_text, encoding="utf-8")
 print(f"Wrote {OUT}")
 
