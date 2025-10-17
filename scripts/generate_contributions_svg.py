@@ -82,15 +82,11 @@ for i, d in enumerate(week_starts):
 # Build SVG with CSS theme and dark-mode palette (no external fonts)
 svg = []
 svg.append(f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" role="img" aria-label="GitHub Activity for {USERNAME}">')
-svg.append('<defs>
-'
-           '  <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
-'
-           '    <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#000" flood-opacity="0.15"/>
-'
-           '  </filter>
-'
-           '</defs>')
+svg.append('''<defs>
+  <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+    <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#000" flood-opacity="0.15"/>
+  </filter>
+</defs>''')
 svg.append('<style>
 '
            '  :root{ --bg:#ffffff; --fg:#57606a; --muted:#8b949e; --border:#d0d7de; }
