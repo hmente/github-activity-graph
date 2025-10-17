@@ -6,7 +6,7 @@ This script fetches GitHub activity data and generates an SVG visualization
 
 import os
 import sys
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta  # TODO: Will be used for date range calculations
 
 
 def fetch_github_contributions(username, token):
