@@ -47,7 +47,7 @@ days_by_week = [w["contributionDays"] for w in weeks]
 flat_counts = [d["contributionCount"] for week in days_by_week for d in week]
 maxv = max(flat_counts) if flat_counts else 0
 
-# Seviye (GitHub benzeri 5 ton)
+# Level calculation (5 bins like GitHub)
 def level(v):
     if v <= 0: return 0
     if maxv <= 4: return min(v, 4)
@@ -57,19 +57,19 @@ def level(v):
     b4 = max(4, math.ceil(maxv*0.85))
     return 1 if v <= b1 else 2 if v <= b2 else 3 if v <= b3 else 4
 
-PALETTE = ["#ebedf0", "#9be9a8", "#40c463", "#30a14e", "#216e39"]
-
-cell = 12
+# Card layout (GitHub Stats-like)
+cell = 11
 gap = 2
-pad_top = 24
-pad_left = 40
-pad_right = 16
-pad_bottom = 24
+pad_top = 56   # header area
+pad_left = 54  # leave room for weekday labels
+pad_right = 24
+pad_bottom = 42
 cols = 52
 rows = 7
 width = pad_left + cols*(cell+gap)-gap + pad_right
 height = pad_top + rows*(cell+gap)-gap + pad_bottom
 
+# Month labels
 week_starts = [datetime.fromisoformat(w["firstDay"].replace("Z", "+00:00")) for w in weeks]
 labels = []
 seen = set()
@@ -79,34 +79,81 @@ for i, d in enumerate(week_starts):
         seen.add(key)
         labels.append((i, d.strftime("%b")))
 
+# Build SVG with CSS theme and dark-mode palette (no external fonts)
 svg = []
-svg.append(f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}">')
-svg.append('<style>.lbl{font:10px -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif; fill:#57606a}</style>')
-svg.append(f'<rect x="0" y="0" width="{width}" height="{height}" fill="white"/>')
-svg.append(f'<text class="lbl" x="{pad_left}" y="16">GitHub Activity — last 52 weeks ({USERNAME})</text>')
+svg.append(f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" role="img" aria-label="GitHub Activity for {USERNAME}">')
+svg.append('<defs>
+'
+           '  <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+'
+           '    <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#000" flood-opacity="0.15"/>
+'
+           '  </filter>
+'
+           '</defs>')
+svg.append('<style>
+'
+           '  :root{ --bg:#ffffff; --fg:#57606a; --muted:#8b949e; --border:#d0d7de; }
+'
+           '  @media (prefers-color-scheme: dark){ :root{ --bg:#0d1117; --fg:#c9d1d9; --muted:#8b949e; --border:#30363d; } }
+'
+           '  .card{ fill:var(--bg); stroke:var(--border); }
+'
+           '  .title{ font:600 14px -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif; fill:var(--fg); }
+'
+           '  .subtitle{ font:400 12px -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif; fill:var(--muted);}
+'
+           '  .lbl{ font:400 10px -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif; fill:var(--muted);}
+'
+           '  .l0{ fill:#ebedf0 } .l1{ fill:#9be9a8 } .l2{ fill:#40c463 } .l3{ fill:#30a14e } .l4{ fill:#216e39 }
+'
+           '  @media (prefers-color-scheme: dark){ .l0{ fill:#161b22 } .l1{ fill:#0e4429 } .l2{ fill:#006d32 } .l3{ fill:#26a641 } .l4{ fill:#39d353 } }
+'
+           '</style>')
 
+# Card background with subtle shadow
+svg.append(f'<rect x="0.5" y="0.5" rx="8" ry="8" width="{width-1}" height="{height-1}" class="card" filter="url(#shadow)"/>')
+
+# Header
+svg.append(f'<text class="title" x="{pad_left}" y="24">GitHub Activity</text>')
+svg.append(f'<text class="subtitle" x="{pad_left}" y="40">last 52 weeks — {USERNAME}</text>')
+
+# Month labels (top)
 for col, txt in labels:
     x = pad_left + col*(cell+gap)
-    svg.append(f'<text class="lbl" x="{x}" y="{pad_top-6}">{txt}</text>')
+    svg.append(f'<text class="lbl" x="{x}" y="{pad_top-8}">{txt}</text>')
 
+# Weekday labels (Mon, Wed, Fri only)
 days_names = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"]
 for r, name in enumerate(days_names):
-    y = pad_top + r*(cell+gap) + 9
-    svg.append(f'<text class="lbl" x="8" y="{y}">{name}</text>')
+    if name in ("Mon","Wed","Fri"):
+        y = pad_top + r*(cell+gap) + 9
+        svg.append(f'<text class="lbl" x="14" y="{y}">{name}</text>')
 
+# Cells
 for c in range(cols):
     week = days_by_week[c]
     for r, d in enumerate(week):
         v = d["contributionCount"]
         lvl = level(v)
-        color = PALETTE[lvl]
+        klass = f"l{lvl}"
         x = pad_left + c*(cell+gap)
         y = pad_top + r*(cell+gap)
         date = d["date"][:10]
-        svg.append(f'<rect x="{x}" y="{y}" width="{cell}" height="{cell}" rx="2" ry="2" fill="{color}"><title>{date}: {v} contributions</title></rect>')
+        svg.append(f'<rect x="{x}" y="{y}" width="{cell}" height="{cell}" rx="2.5" ry="2.5" class="{klass}"><title>{date}: {v} contributions</title></rect>')
+
+# Legend
+legend_x = width - pad_right - (5*cell + 4*gap)
+legend_y = height - pad_bottom + 16
+svg.append(f'<text class="lbl" x="{legend_x-36}" y="{legend_y+8}">Less</text>')
+for i in range(5):
+    x = legend_x + i*(cell+gap)
+    svg.append(f'<rect x="{x}" y="{legend_y}" width="{cell}" height="{cell}" rx="2.5" ry="2.5" class="l{i}"/>')
+svg.append(f'<text class="lbl" x="{legend_x + 5*(cell+gap) + 4}" y="{legend_y+8}">More</text>')
 
 svg.append('</svg>')
-svg_text = "\n".join(svg)
+svg_text = "
+".join(svg)
 OUT.write_text(svg_text, encoding="utf-8")
 print(f"Wrote {OUT}")
 
