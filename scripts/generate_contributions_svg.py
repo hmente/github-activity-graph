@@ -87,25 +87,16 @@ svg.append('''<defs>
     <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#000" flood-opacity="0.15"/>
   </filter>
 </defs>''')
-svg.append('<style>
-'
-           '  :root{ --bg:#ffffff; --fg:#57606a; --muted:#8b949e; --border:#d0d7de; }
-'
-           '  @media (prefers-color-scheme: dark){ :root{ --bg:#0d1117; --fg:#c9d1d9; --muted:#8b949e; --border:#30363d; } }
-'
-           '  .card{ fill:var(--bg); stroke:var(--border); }
-'
-           '  .title{ font:600 14px -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif; fill:var(--fg); }
-'
-           '  .subtitle{ font:400 12px -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif; fill:var(--muted);}
-'
-           '  .lbl{ font:400 10px -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif; fill:var(--muted);}
-'
-           '  .l0{ fill:#ebedf0 } .l1{ fill:#9be9a8 } .l2{ fill:#40c463 } .l3{ fill:#30a14e } .l4{ fill:#216e39 }
-'
-           '  @media (prefers-color-scheme: dark){ .l0{ fill:#161b22 } .l1{ fill:#0e4429 } .l2{ fill:#006d32 } .l3{ fill:#26a641 } .l4{ fill:#39d353 } }
-'
-           '</style>')
+svg.append("""<style>
+  :root{ --bg:#ffffff; --fg:#57606a; --muted:#8b949e; --border:#d0d7de; }
+  @media (prefers-color-scheme: dark){ :root{ --bg:#0d1117; --fg:#c9d1d9; --muted:#8b949e; --border:#30363d; } }
+  .card{ fill:var(--bg); stroke:var(--border); }
+  .title{ font:600 14px -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif; fill:var(--fg); }
+  .subtitle{ font:400 12px -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif; fill:var(--muted);}
+  .lbl{ font:400 10px -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif; fill:var(--muted);}
+  .l0{ fill:#ebedf0 } .l1{ fill:#9be9a8 } .l2{ fill:#40c463 } .l3{ fill:#30a14e } .l4{ fill:#216e39 }
+  @media (prefers-color-scheme: dark){ .l0{ fill:#161b22 } .l1{ fill:#0e4429 } .l2{ fill:#006d32 } .l3{ fill:#26a641 } .l4{ fill:#39d353 } }
+</style>""")
 
 # Card background with subtle shadow
 svg.append(f'<rect x="0.5" y="0.5" rx="8" ry="8" width="{width-1}" height="{height-1}" class="card" filter="url(#shadow)"/>')
